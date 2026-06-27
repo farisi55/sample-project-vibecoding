@@ -1,50 +1,84 @@
-# Knowledge & Coding Rules: Puter.ai Chatbot Web
+# Knowledge & Coding Rules: Web Chatbot Puter.ai
 
-Dokumen ini berisi panduan teknis, batasan, dan standar penulisan kode untuk AI Agent dalam mengembangkan aplikasi Web Chatbot berbasis hosting dan arsitektur Node/JS dari Puter.ai.
+Dokumen ini berisi panduan teknis dan standar penulisan kode untuk pengembangan aplikasi Web Chatbot berbasis Puter.ai.
 
 ## 1. Tech Stack & Environment
-- **Environment**: Puter.ai Cloud Environment (Vanilla JS / Node.js standard).
-- **Frontend**: HTML5, Tailwind CSS (via CDN), dan JavaScript murni (ES6+).
-- **SDK Utama**: Puter.js SDK (`<script src="https://puter.com"></script>`).
-- **AI Model**: Puter AI Chat Completion API (Model default: `gpt-4o` atau model gratis bawaan Puter).
+- **Arsitektur**: Single Page Application (SPA) statis — 100% client-side, tanpa server backend.
+- **Frontend**: HTML5, Tailwind CSS (via CDN), JavaScript ES6+ murni.
+- **SDK Utama**: Puter.js (`<script src="https://js.puter.com/v2/"></script>`).
+- **AI Model**: Puter AI Chat Completion — `puter.ai.chat()`.
+- **Penyimpanan**: Puter Key-Value Store — `puter.kv.set()` / `puter.kv.get()`.
+- **Keamanan**: DILARANG menggunakan API Key eksternal (OpenAI, Anthropic, dll). Otentikasi sepenuhnya via sistem otomatis browser/hosting Puter.
 
-## 2. Coding Rules & Puter.js Standards
+## 2. Coding Rules & Standar Penulisan Fungsi
 
 ### A. Inisialisasi SDK
-- Selalu pastikan SDK Puter dimuat sebelum script utama berjalan.
-- Gunakan objek global `puter` yang disediakan oleh SDK. Jangan melakukan instalasi npm jika aplikasi dideploy langsung sebagai static hosting di Puter.
+- Gunakan `waitForPuter()` untuk memastikan objek global `puter` siap sebelum menjalankan fitur apa pun.
+- Format: polling `typeof puter !== 'undefined' && puter.ai` dengan interval 500ms (maks 20 kali percobaan).
 
 ### B. Pemanggilan AI Chat
-- Gunakan sintaks `puter.ai.chat()` untuk interaksi chatbot.
-- Jangan gunakan library pihak ketiga seperti `openai` atau `axios` untuk memanggil LLM. Manfaatkan fitur native bawaan Puter.
-- Gunakan format `async/await` untuk menangani *asynchronous requests*.
+- Wajib menggunakan `puter.ai.chat()` — dilarang menggunakan library pihak ketiga (`openai`, `axios`, dll).
+- Format `async/await` untuk semua asynchronous request.
+- Gunakan parameter opsi: `system_prompt`, `stream: false`, `compaction: true`.
+- Sertakan riwayat percakapan (multi-turn) dalam array `conversationHistory` dengan format `{ role, content }`.
 
-Contoh struktur kode yang benar:
+Contoh standar:
 ```javascript
-async function fetchBotResponse(userMessage) {
+async function fetchBotResponse(messages) {
     try {
-        const response = await puter.ai.chat(userMessage, {
-            system_prompt: "Anda adalah asisten chatbot yang ramah dan membantu."
+        const response = await puter.ai.chat(messages, {
+            system_prompt: "Anda adalah asisten chatbot yang ramah, profesional, dan ahli teknologi.",
+            stream: false,
+            compaction: true
         });
-        return response;
+        return response?.message?.content || response?.result?.message?.content;
     } catch (error) {
-        console.error("Puter AI Error:", error);
-        return "Maaf, terjadi kesalahan koneksi.";
+        return "⚠️ Maaf, terjadi kesalahan. Silakan coba lagi.";
     }
 }
 ```
 
-### C. Manajemen Data (Puter Key-Value / Database)
-- Jika chatbot membutuhkan penyimpanan memori riwayat chat (*chat history*), gunakan **Puter Key-Value Store**.
-- Gunakan `puter.kv.set(key, value)` dan `puter.kv.get(key)` untuk menyimpan sesi chat pengguna.
+### C. Manajemen Riwayat Chat (Puter KV Store)
+- Simpan riwayat percakapan ke KV Store setiap kali bot selesai merespons.
+- Muat riwayat dari KV Store saat halaman dimuat (di dalam `waitForPuter`).
+- Gunakan satu key tetap, misal: `'chatbot_history'`.
+- Data disimpan sebagai JSON string dari array `conversationHistory`.
 
-## 3. UI/UX & DOM Manipulation
-- Desain antarmuka wajib responsif (mobile-friendly) menggunakan utilitas Tailwind CSS.
-- Komponen chat harus memiliki fitur *auto-scroll* ke bawah setiap kali ada pesan baru masuk.
-- Tampilkan indikator *loading* (efek mengetik/animasi *dots*) saat menunggu respons dari `puter.ai.chat`.
-- Semua teks input dari pengguna wajib melalui sanitasi sederhana mencegah XSS sebelum dimasukkan ke dalam elemen DOM (`textContent` lebih disukai daripada `innerHTML`).
+## 3. Arsitektur Kode & DOM Manipulation
 
-## 4. Constraints & Keamanan (Security)
-- **Tanpa API Key**: Puter.js menggunakan sistem otentikasi otomatis berbasis konteks browser/hosting. Jangan pernah menuliskan API Key OpenAI, Anthropic, atau token eksternal lainnya di dalam kode.
-- **Keterbatasan Kuota**: Karena akun Puter memiliki batas token/kredit gratis, optimalkan jumlah prompt teks. Jangan mengirimkan riwayat chat yang terlalu panjang dalam satu *request*.
-- **Penyimpanan Berkas**: Jika aplikasi membutuhkan penyimpanan aset gambar/ikon chatbot, gunakan fitur **Puter KV** atau simpan langsung di folder lokal aplikasi, bukan link eksternal yang tidak stabil.
+### A. Struktur File
+- `index.html` — Struktur HTML, container chat, form input, CDN.
+- `script.js` — Semua logika JavaScript (IIFE pattern, strict mode).
+- `style.css` — Gaya kustom (opsional, jika Tailwind belum mencukupi).
+
+### B. Manajemen DOM
+- **Sanitasi input**: Gunakan `textContent` daripada `innerHTML` untuk mencegah XSS.
+- **Auto-scroll**: `container.scrollTop = container.scrollHeight` setiap pesan baru.
+- **Typing indicator**: Tampilkan animasi 3 dots saat menunggu respons AI.
+- **Animasi**: Efek fade-in/scale untuk setiap pesan baru.
+- **CSS**: Tailwind via CDN + kustom CSS jika diperlukan (misal: gradient latar, glassmorphism).
+
+### C. State Management
+- Array `conversationHistory` menyimpan seluruh percakapan (system prompt + user + assistant).
+- Flag `isProcessing` mencegah pengiriman ganda saat respons sedang diproses.
+- Flag `puterReady` menandakan SDK sudah siap digunakan.
+
+## 4. Fitur Aplikasi (Dari PRD)
+
+| Fitur | Implementasi |
+|-------|-------------|
+| Chat Interface UI | Header, suggestions chips, messages container, input form, footer |
+| Kirim pesan | Form submit + Enter (tanpa Shift) |
+| Auto-resize textarea | `style.height` = `Math.min(scrollHeight, 120) + 'px'` |
+| Tombol kirim | Dinonaktifkan saat input kosong atau sedang processing |
+| AI Integration | `puter.ai.chat(conversationHistory, { system_prompt, stream, compaction })` |
+| Chat History | Simpan/muat dari `puter.kv` dengan key tetap |
+| Hapus Riwayat | Tombol di header untuk clear KV + reset UI + reload greeting |
+| Error Handling | Pesan error ramah di layar (bukan hanya console.log) |
+| Responsive | Mobile-friendly penuh, maks-width container 480px |
+
+## 5. Batasan & Constraints
+- **Tanpa server**: Semua kode berjalan di browser, tidak ada backend.
+- **Tanpa API key eksternal**: Hanya mengandalkan otentikasi bawaan Puter.
+- **Batas token/kuota**: Optimalkan panjang prompt — jangan kirim riwayat terlalu panjang dalam satu request.
+- **Penyimpanan**: Gunakan Puter KV untuk persistence; tidak ada database lain.

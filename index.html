@@ -3,57 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puter.ai Chatbot Demo</title>
-    <link rel="stylesheet" href="style.css">
+    <title>AI Chatbot — Puter.ai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
     <script src="https://js.puter.com/v2/"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="app-container">
+    <div id="app" class="app-container">
 
-        <!-- Header -->
+        <!-- ===== HEADER ===== -->
         <header class="chat-header">
-            <div class="avatar">🤖</div>
-            <div class="info">
-                <h1>AI Chatbot</h1>
-                <div class="status">
-                    <span class="dot"></span>
+            <div class="header-avatar">🤖</div>
+            <div class="header-info">
+                <h1 class="header-title">AI Chatbot</h1>
+                <div class="header-status">
+                    <span class="status-dot"></span>
                     <span>Terhubung</span>
                 </div>
             </div>
-            <span class="puter-badge">Puter.ai</span>
+            <button class="clear-btn" id="clearBtn" title="Hapus Riwayat" aria-label="Hapus riwayat chat">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+            </button>
         </header>
 
-        <!-- Suggestions -->
+        <!-- ===== SUGGESTIONS CHIPS ===== -->
         <div class="suggestions" id="suggestions">
             <span class="chip" data-question="Apa itu AI?">Apa itu AI?</span>
-            <span class="chip" data-question="Jelaskan tentang puter.ai">Tentang Puter.ai</span>
+            <span class="chip" data-question="Jelaskan tentang Puter.ai">Tentang Puter.ai</span>
             <span class="chip" data-question="Buatkan puisi pendek tentang coding">Puisi coding</span>
-            <span class="chip" data-question="Tips belajar pemrograman">Tips belajar</span>
+            <span class="chip" data-question="Tips belajar pemrograman untuk pemula">Tips belajar</span>
         </div>
 
-        <!-- Messages -->
+        <!-- ===== MESSAGES CONTAINER ===== -->
         <div class="messages-container" id="messagesContainer">
             <div class="message bot" id="defaultGreeting">
                 <div class="msg-avatar">🤖</div>
                 <div class="bubble">
-                    Halo! 👋 Saya adalah AI chatbot yang didukung oleh <strong>Puter.ai</strong>.<br>
-                    Tanya apa saja, saya siap membantu!
+                    <p>Halo! 👋 Saya adalah AI chatbot yang didukung oleh <strong>Puter.ai</strong>.<br>
+                    Tanya apa saja, saya siap membantu!</p>
                 </div>
             </div>
         </div>
 
-        <!-- Typing Indicator -->
+        <!-- ===== TYPING INDICATOR ===== -->
         <div class="typing-indicator" id="typingIndicator">
-            <div class="typing-avatar">🤖</div>
-            <div class="bubble">
-                <span></span>
-                <span></span>
-                <span></span>
+            <div class="msg-avatar">🤖</div>
+            <div class="bubble typing-bubble">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
             </div>
         </div>
 
-        <!-- Input -->
+        <!-- ===== INPUT AREA ===== -->
         <div class="input-container">
             <form id="chatForm" autocomplete="off">
                 <div class="input-wrapper">
@@ -68,6 +85,7 @@
                         class="send-btn"
                         id="sendBtn"
                         aria-label="Kirim pesan"
+                        disabled
                     >
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -78,7 +96,7 @@
             </form>
         </div>
 
-        <!-- Footer -->
+        <!-- ===== FOOTER ===== -->
         <div class="footer">
             Powered by <a href="https://puter.ai" target="_blank" rel="noopener">Puter.ai</a>
         </div>
