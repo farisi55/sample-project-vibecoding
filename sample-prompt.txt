@@ -1,0 +1,13 @@
+siklus Cek Task → Coding → Testing → Tulis Changelog
+
+#first prompt
+
+Tolong baca @prd-mentah. Ekstrak dokumen tersebut menjadi berkas @knowledge baru yang ringkas, berfokus hanya pada aturan teknis, tech stack, arsitektur kode, standar penulisan fungsi, dan batasan UI agar bisa dipahami oleh AI agent secara efisien."
+
+#second prompt
+
+"Tolong baca berkas @knowledge yang berisi aturan proyek ini. Berdasarkan teknologi dan fitur chatbot yang tertulis di sana, tolong buatkan sebuah berkas baru bernama changelog.md di root directory.Berkas changelog.md tersebut harus mengikuti struktur berikut:Bagian [CURRENT TASK IN PROGRESS]: Isi dengan Task #001 untuk inisialisasi file dasar (index.html, script.js, style.css) lengkap dengan integrasi CDN Puter.js dan Tailwind CSS sesuai aturan knowledge.Bagian [NEXT TASKS]: Pecah fitur-fitur yang ada di knowledge menjadi daftar tugas terpisah (misal: Task #002 untuk UI Chat Box, Task #003 untuk Integrasi API Puter Chat, Task #004 untuk Fitur Puter KV Store, dst).Bagian [HISTORY OF CHANGES]: Biarkan kosong atau beri keterangan bahwa proyek baru dimulai.Tolong buatkan berkas changelog.md ini sekarang dan jangan lakukan kodingan lain dulu sebelum berkas ini selesai dibuat."
+
+#third prompt
+
+"Tolong baca @knowledge dan @changelog. Saat ini proyek masih kosong.Sesuai dengan Task #001, tolong buatkan berkas pertama: index.html (berisi boilerplate HTML5, CDN Puter.js, dan CDN Tailwind), script.js (berisi inisialisasi awal log), dan style.css (jika diperlukan tambahan kustom).Setelah selesai membuat file tersebut, lakukan pengujian internal (testing). Jika file berhasil dibuat tanpa error, perbarui @changelog dengan memindahkan Task #001 ke [HISTORY OF CHANGES] dengan status OK, lalu naikkan Task #002 ke bagian [CURRENT TASK IN PROGRESS]. Mari mulai!"

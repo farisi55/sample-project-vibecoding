@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puter.ai Chatbot Demo</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://js.puter.com/v2/"></script>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- Header -->
+        <header class="chat-header">
+            <div class="avatar">🤖</div>
+            <div class="info">
+                <h1>AI Chatbot</h1>
+                <div class="status">
+                    <span class="dot"></span>
+                    <span>Terhubung</span>
+                </div>
+            </div>
+            <span class="puter-badge">Puter.ai</span>
+        </header>
+
+        <!-- Suggestions -->
+        <div class="suggestions" id="suggestions">
+            <span class="chip" data-question="Apa itu AI?">Apa itu AI?</span>
+            <span class="chip" data-question="Jelaskan tentang puter.ai">Tentang Puter.ai</span>
+            <span class="chip" data-question="Buatkan puisi pendek tentang coding">Puisi coding</span>
+            <span class="chip" data-question="Tips belajar pemrograman">Tips belajar</span>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="message bot" id="defaultGreeting">
+                <div class="msg-avatar">🤖</div>
+                <div class="bubble">
+                    Halo! 👋 Saya adalah AI chatbot yang didukung oleh <strong>Puter.ai</strong>.<br>
+                    Tanya apa saja, saya siap membantu!
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-avatar">🤖</div>
+            <div class="bubble">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="input-container">
+            <form id="chatForm" autocomplete="off">
+                <div class="input-wrapper">
+                    <textarea
+                        id="userInput"
+                        rows="1"
+                        placeholder="Ketik pesan..."
+                        aria-label="Pesan chat"
+                    ></textarea>
+                    <button
+                        type="submit"
+                        class="send-btn"
+                        id="sendBtn"
+                        aria-label="Kirim pesan"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            Powered by <a href="https://puter.ai" target="_blank" rel="noopener">Puter.ai</a>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
