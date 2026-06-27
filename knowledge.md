@@ -1,84 +1,101 @@
-# Knowledge & Coding Rules: Web Chatbot Puter.ai
+---
+project: Web Chatbot with Puter.ai
+version: 1.0.0
+source: prd
+last_updated: 2026-06-28
+---
 
-Dokumen ini berisi panduan teknis dan standar penulisan kode untuk pengembangan aplikasi Web Chatbot berbasis Puter.ai.
+## 1. Project Identity
 
-## 1. Tech Stack & Environment
-- **Arsitektur**: Single Page Application (SPA) statis — 100% client-side, tanpa server backend.
-- **Frontend**: HTML5, Tailwind CSS (via CDN), JavaScript ES6+ murni.
-- **SDK Utama**: Puter.js (`<script src="https://js.puter.com/v2/"></script>`).
-- **AI Model**: Puter AI Chat Completion — `puter.ai.chat()`.
-- **Penyimpanan**: Puter Key-Value Store — `puter.kv.set()` / `puter.kv.get()`.
-- **Keamanan**: DILARANG menggunakan API Key eksternal (OpenAI, Anthropic, dll). Otentikasi sepenuhnya via sistem otomatis browser/hosting Puter.
+- **Project name**: Web Chatbot with Puter.ai
+- **Purpose**: Lightweight web chatbot deployed on Cloudflare Pages that authenticates users and proxies AI requests exclusively through Puter.ai
+- **Primary users**: Developers
+- **Core platform**: Web (Desktop-first, browser-based SPA)
 
-## 2. Coding Rules & Standar Penulisan Fungsi
+## 2. Tech Stack
 
-### A. Inisialisasi SDK
-- Gunakan `waitForPuter()` untuk memastikan objek global `puter` siap sebelum menjalankan fitur apa pun.
-- Format: polling `typeof puter !== 'undefined' && puter.ai` dengan interval 500ms (maks 20 kali percobaan).
+- **Languages & runtimes**: TypeScript 5.x, Node.js 20 LTS (build tools only)
+- **Framework**: React 18 + Vite (lightweight client SPA — assumed)
+- **Database**: None
+- **ORM / Query builder**: None
+- **Cache**: None (client-side memory only)
+- **Infrastructure**: Cloudflare Pages (Free Tier)
+- **Key third-party services**: Puter.ai — authentication (`puter.auth.signIn()`) & AI model inference (`puter.ai.chat()`)
+- **Frontend**: HTML / CSS / TypeScript SPA
 
-### B. Pemanggilan AI Chat
-- Wajib menggunakan `puter.ai.chat()` — dilarang menggunakan library pihak ketiga (`openai`, `axios`, dll).
-- Format `async/await` untuk semua asynchronous request.
-- Gunakan parameter opsi: `system_prompt`, `stream: false`, `compaction: true`.
-- Sertakan riwayat percakapan (multi-turn) dalam array `conversationHistory` dengan format `{ role, content }`.
+## 3. Architecture
 
-Contoh standar:
-```javascript
-async function fetchBotResponse(messages) {
-    try {
-        const response = await puter.ai.chat(messages, {
-            system_prompt: "Anda adalah asisten chatbot yang ramah, profesional, dan ahli teknologi.",
-            stream: false,
-            compaction: true
-        });
-        return response?.message?.content || response?.result?.message?.content;
-    } catch (error) {
-        return "⚠️ Maaf, terjadi kesalahan. Silakan coba lagi.";
-    }
-}
-```
+- **Pattern**: Client-Side Single Page Application (SPA)
+- **Module structure**:
+  - `src/components/` — Chat UI, Model Selector, Auth Button
+  - `src/services/` — Puter.ai API wrappers (Facade pattern)
+  - `src/types/` — TypeScript interfaces
+  - `src/App.tsx` — Main application shell
+  - `src/main.tsx` — Entry point
+- **Design patterns**: Facade (for wrapping Puter.ai SDK calls)
+- **Data flow**: Client UI → Puter.js SDK → Puter.ai Cloud → Client UI
 
-### C. Manajemen Riwayat Chat (Puter KV Store)
-- Simpan riwayat percakapan ke KV Store setiap kali bot selesai merespons.
-- Muat riwayat dari KV Store saat halaman dimuat (di dalam `waitForPuter`).
-- Gunakan satu key tetap, misal: `'chatbot_history'`.
-- Data disimpan sebagai JSON string dari array `conversationHistory`.
+## 4. Code Standards
 
-## 3. Arsitektur Kode & DOM Manipulation
+- **File naming**: kebab-case (e.g., `chat-window.tsx`)
+- **Function naming**: camelCase (e.g., `sendMessage`)
+- **Class / type naming**: PascalCase (e.g., `ChatMessage`)
+- **Formatter**: Prettier
+- **Linter**: ESLint + `@typescript-eslint`
+- **Testing framework**: Vitest
+- **Test coverage target**: 80% on core Puter.ai service wrappers
+- **Error handling**: `try-catch` at component boundaries; display user-friendly toast notifications on Puter API failure
 
-### A. Struktur File
-- `index.html` — Struktur HTML, container chat, form input, CDN.
-- `script.js` — Semua logika JavaScript (IIFE pattern, strict mode).
-- `style.css` — Gaya kustom (opsional, jika Tailwind belum mencukupi).
+## 5. API & Data Contracts
 
-### B. Manajemen DOM
-- **Sanitasi input**: Gunakan `textContent` daripada `innerHTML` untuk mencegah XSS.
-- **Auto-scroll**: `container.scrollTop = container.scrollHeight` setiap pesan baru.
-- **Typing indicator**: Tampilkan animasi 3 dots saat menunggu respons AI.
-- **Animasi**: Efek fade-in/scale untuk setiap pesan baru.
-- **CSS**: Tailwind via CDN + kustom CSS jika diperlukan (misal: gradient latar, glassmorphism).
+- **API type**: N/A — client connects directly to Puter.ai via Puter.js SDK
+- **Base URL pattern**: N/A
+- **Authentication method**: Puter.ai native login — `puter.auth.signIn()`
+- **Response envelope**: N/A — handled by Puter SDK
+- **Error format**: N/A — handled by Puter SDK
+- **Pagination**: None
+- **Core entity — Message**:
+  ```
+  { id: string, role: 'user' | 'assistant', content: string, timestamp: number }
+  ```
+- **Storage strategy**: In-memory (React state); optionally `localStorage` for session persistence
 
-### C. State Management
-- Array `conversationHistory` menyimpan seluruh percakapan (system prompt + user + assistant).
-- Flag `isProcessing` mencegah pengiriman ganda saat respons sedang diproses.
-- Flag `puterReady` menandakan SDK sudah siap digunakan.
+## 6. UI / UX Constraints
 
-## 4. Fitur Aplikasi (Dari PRD)
+- **Component library**: None specified (base React components)
+- **Authentication screen**: Simple centered login card — "Sign in with Puter" button when unauthenticated
+- **Chat layout**: User messages right-aligned, AI messages left-aligned
+- **Loading state**: Show loading indicator while waiting for Puter.ai response
+- **Scroll behavior**: Auto-scroll to bottom on new message
+- **Model selector**: Dropdown above the chat window header
+- **Empty messages**: Cannot be sent (Send button disabled when empty)
+- **Accessibility**: Basic semantic HTML
+- **Responsive**: Desktop-first focus
+- **Bundle size**: < 500KB (gzipped)
+- **TTI**: < 2 seconds on standard broadband
 
-| Fitur | Implementasi |
-|-------|-------------|
-| Chat Interface UI | Header, suggestions chips, messages container, input form, footer |
-| Kirim pesan | Form submit + Enter (tanpa Shift) |
-| Auto-resize textarea | `style.height` = `Math.min(scrollHeight, 120) + 'px'` |
-| Tombol kirim | Dinonaktifkan saat input kosong atau sedang processing |
-| AI Integration | `puter.ai.chat(conversationHistory, { system_prompt, stream, compaction })` |
-| Chat History | Simpan/muat dari `puter.kv` dengan key tetap |
-| Hapus Riwayat | Tombol di header untuk clear KV + reset UI + reload greeting |
-| Error Handling | Pesan error ramah di layar (bukan hanya console.log) |
-| Responsive | Mobile-friendly penuh, maks-width container 480px |
+## 7. Business Logic & Domain Rules
 
-## 5. Batasan & Constraints
-- **Tanpa server**: Semua kode berjalan di browser, tidak ada backend.
-- **Tanpa API key eksternal**: Hanya mengandalkan otentikasi bawaan Puter.
-- **Batas token/kuota**: Optimalkan panjang prompt — jangan kirim riwayat terlalu panjang dalam satu request.
-- **Penyimpanan**: Gunakan Puter KV untuk persistence; tidak ada database lain.
+- **Authentication gating**: App is entirely locked behind Puter authentication. No guest access.
+- **Model availability**: Must only list models explicitly available on the Puter.ai free tier
+- **Model routing**: Selecting a model updates active state; subsequent messages use the selected model
+- **Input validation**: Empty messages are rejected (not sent)
+
+## 8. Environment & Configuration
+
+- **Environments**: `prod` only
+- **Required env vars**: None (Puter SDK relies on domain whitelisting / client-side initialization)
+- **Feature flags**: None
+- **CI/CD**: GitHub Actions → Cloudflare Pages
+- **Health check**: `GET /` → `200 OK` (static asset load)
+
+## 9. Constraints & Anti-patterns
+
+- **Deployment**: Must run exclusively on Cloudflare Pages Free Tier
+- **No backend**: Cannot use Node.js backend features (`fs`, `net`) at runtime — static/SPA only
+- **No server-side APIs**: No backend servers or server-side APIs built into this project
+- **No external storage**: No storage of user chat data outside of local browser memory or Puter.ai's own managed storage
+- **No hardcoded API keys**: All auth must flow through the Puter.js SDK user login
+- **Rate limits**: Must gracefully handle HTTP 429 Too Many Requests from Puter.ai
+- **No paid tiers**: No custom API key inputs outside of Puter.ai
+- **Out of scope**: Workspaces, user management dashboards, payment gateways, custom backend databases for chat history
