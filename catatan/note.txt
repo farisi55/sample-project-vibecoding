@@ -1,0 +1,15 @@
+next :
+
+jika microservice apakah perlu knowledge.md perlu dipecah (misal knowledge-frontend.md, knowledge-backend.md) termasuk changelog.md (changelog-frontend.md, changelog-backend.md)
+
+-- 
+
+saya mau setiap mengerjakan NEXT TASKS di changelog.md harus di test QA terlebih dahulu (bisa menggunakan unit test di project)
+
+jika sudah oke baru lanjut NEXT TASKS berikutnya.
+
+setelah selesai TASK yang sedang berjalan, sebelum diubah ke COMPLETED, harus di test QA dahulu, pastikan sudah OK semua test QA nya.
+
+setelah itu STOP, jangan lanjut NEXT TASKS. karena harus divalidasi manual juga oleh human (developer)
+
+jadi TASK tidak boleh otomatis loop, harus tetap manual setiap dijalankan
