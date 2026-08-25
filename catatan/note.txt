@@ -1,8 +1,10 @@
-next :
+quetion :
 
-jika microservice apakah perlu knowledge.md perlu dipecah (misal knowledge-frontend.md, knowledge-backend.md) termasuk changelog.md (changelog-frontend.md, changelog-backend.md)
+jika microservice apakah perlu knowledge.md perlu dipecah (misal knowledge-frontend.md, knowledge-backend.md) termasuk changelog.md (changelog-frontend.md, changelog-backend.md).
+jadi tidak 1 project, namun dibagi bebeapa project contoh : ecommerce-frontend, ecommerce-backend, ecommerce-middleware
 
 -- 
+next feature :
 
 saya mau setiap mengerjakan NEXT TASKS di changelog.md harus di test QA terlebih dahulu (bisa menggunakan unit test di project)
 
